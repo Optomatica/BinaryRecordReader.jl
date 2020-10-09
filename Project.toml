@@ -1,0 +1,13 @@
+name = "BinaryRecReader"
+uuid = "27e49e6c-9eba-4945-878d-08e5ccc7cbcd"
+authors = ["mbeltagy <mohammed.elbeltagy@gmail.com> and contributors"]
+version = "0.1.0"
+
+[compat]
+julia = "1.5.2"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
