@@ -12,7 +12,8 @@ end
 
 
 macro construct_reader(Struct)
-    :(@construct_reader $Struct NamedTuple())
+    s = eval(:($__module__.$Struct))
+    esc(construct_reader_exp(Struct,s,NamedTuple()))
 end
 
 function construct_reader_exp(Struct, s, array_specs)

@@ -2,22 +2,27 @@ using BinaryRecReader
 using Test
 
 # First we declare some simple structures 
+
 struct Boo
     x::Int64
     y::Float16
 end
 
-simple_file=tempname()
-open(simple_file,"w") do io
-    for i=1:1000
-        if i==500 #Special write
-            write(io,123,Float64(123))
-        else
-            write(io,rand(Int64),rand(Float16))
+@testset "Simple Read" begin
+    simple_file=tempname()
+    n_rec=1000
+    open(simple_file,"w") do io
+        for i=1:n_rec
+            if i==500 #Special write
+                write(io,Ref(Boo(123,123)))
+            else
+                write(io,Ref(Boo(i,55)))
+            end
         end
     end
-end
-
-@testset "Simple Read" begin
-    # Write your tests here.
-end
+    @construct_reader Boo
+    my_data=Vector{Boo}(undef,n_rec)
+    read!(simple_file,my_data);
+    @test my_data[500].x == 123
+    @test my_data[500].y == Float16(123)
+end;
