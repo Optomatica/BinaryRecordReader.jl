@@ -1,7 +1,7 @@
 # BinaryRecordReader
 
 [![Build Status](https://travis-ci.com/Optomatica/BinaryRecordReader.jl.svg?branch=master)](https://travis-ci.com/Optomatica/BinaryRecordReader.jl)
-[![Build Status](https://ci.appveyor.com/api/projects/status/github/mbeltagy/BinaryRecordReader.jl?svg=true)](https://ci.appveyor.com/project/mbeltagy/BinaryRecordReader-jl)
+[![Build status](https://ci.appveyor.com/api/projects/status/fhpn75k3r67ow3ke/branch/master?svg=true)](https://ci.appveyor.com/project/mbeltagy/binaryrecordreader-jl/branch/master)
 [![Coverage](https://codecov.io/gh/mbeltagy/BinaryRecordReader.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/mbeltagy/BinaryRecordReader.jl)
 [![Coverage](https://coveralls.io/repos/github/mbeltagy/BinaryRecordReader.jl/badge.svg?branch=master)](https://coveralls.io/github/mbeltagy/BinaryRecordReader.jl?branch=master)
 
