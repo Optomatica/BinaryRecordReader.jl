@@ -3,26 +3,158 @@ using Test
 
 # First we declare some simple structures 
 
-struct Boo
-    x::Int64
-    y::Float16
+@testset "Isbits reader" begin
+    struct Boo
+        x::Int64
+        y::Float16
+    end
+
+    struct TinyStruct 
+        b::Int
+    end
+
+    struct MinorStruct 
+        a::Int
+        c::TinyStruct 
+    end
+
+
+    struct MajorStruct  
+        long::Float32
+        lat::Float32
+        speed::Int16
+        COG::UInt16
+        time::Int32
+        more::MinorStruct
+    end
+
+    @test_logs (:warn, "Attempt to create a reader for plain data type Boo") BinaryRecReader.construct_reader_exp(:Boo, Boo, NamedTuple())
+    @test_logs (:warn, "Attempt to create a reader for plain data type TinyStruct") BinaryRecReader.construct_reader_exp(:TinyStruct, TinyStruct, NamedTuple())
+    @test_logs (:warn, "Attempt to create a reader for plain data type MinorStruct") BinaryRecReader.construct_reader_exp(:MinorStruct, MinorStruct, NamedTuple())
+    @test_logs (:warn, "Attempt to create a reader for plain data type MajorStruct") BinaryRecReader.construct_reader_exp(:MajorStruct, MinorStruct, NamedTuple())
+end;
+
+struct RecHeaderExtended 
+    long::Float32
+    lat::Float32
+    speed::Int16
+    COG::UInt16
+    time::Int32
+    data::Matrix{Int32}
 end
 
-@testset "Simple Read" begin
-    simple_file=tempname()
-    n_rec=1000
-    open(simple_file,"w") do io
-        for i=1:n_rec
-            if i==500 #Special write
-                write(io,Ref(Boo(123,123)))
+@testset "Single Level Reader " begin
+    simple_file = tempname()
+    n_rec = 1000
+    open(simple_file, "w") do io
+        for i = 1:n_rec
+            if i == 500 # Special write
+                write(io, Float32(5), Float32(6), Int16(7), UInt16(8), Int32(9), Int32(4)* ones(Int32, 6, 600))
             else
-                write(io,Ref(Boo(i,55)))
+                write(io, rand(Float32), rand(Float32), rand(Int16), rand(UInt16), rand(Int32), rand(Int32, 6, 600))
             end
         end
     end
-    @construct_reader Boo
-    my_data=Vector{Boo}(undef,n_rec)
-    read!(simple_file,my_data);
-    @test my_data[500].x == 123
-    @test my_data[500].y == Float16(123)
+
+    @construct_reader RecHeaderExtended (data = (6, 600),)
+    my_data = Vector{RecHeaderExtended}(undef, n_rec)
+    read!(simple_file, my_data);
+    @test my_data[500].long == 5
+    @test my_data[500].lat == 6
+    @test my_data[500].speed == 7
+    @test my_data[500].COG == 8
+    @test my_data[500].time == 9
+    @test my_data[500].data == 4* ones(Int32, 6, 600)
+    @test_throws TypeError BinaryRecReader.construct_reader_exp(:RecHeaderExtended , RecHeaderExtended , (long = (6, 600),)) 
+end;
+
+struct SimpleRec
+    lat::Float32
+    time::Int32
+end
+
+struct CompoundRec
+    long::Float32
+    COG::UInt16
+    data::Matrix{SimpleRec}
+end
+
+@testset "Nested Structure Reader " begin
+    simple_file = tempname()
+    n_rec = 1000
+    open(simple_file, "w") do io
+        for i = 1:n_rec
+            if i == 500 # Special write
+                write(io, Float32(5), UInt16(8), [SimpleRec(5,5) for i=1:6, y=1:600])
+            else
+                write(io, rand(Float32), rand(UInt16), [SimpleRec(rand(Float32), rand(Int32)) for i=1:6, y=1:600])
+            end
+        end
+    end
+
+    @construct_reader CompoundRec (data = (6, 600),)
+    my_data = Vector{CompoundRec }(undef, n_rec)
+    read!(simple_file, my_data);
+    @test my_data[500].long == 5
+    @test my_data[500].COG == 8
+    @test all([x==SimpleRec(5,5) for x in my_data[500].data])
+end;
+
+struct SimpleRecMat
+    lat::Float32
+    time::Matrix{Int32}
+end
+
+struct AnotherSimpleRecMat
+    fun::UInt8
+    funMat::Matrix{UInt16}
+end
+
+struct CompoundRecComplex
+    long::Float32
+    COG::UInt16
+    funky::AnotherSimpleRecMat
+    data::Matrix{SimpleRecMat}
+end
+
+@testset "Nested Structure Reader with none isbits matrix" begin
+    simple_file = tempname()
+    n_rec = 1000
+    open(simple_file, "w") do io
+        for i = 1:n_rec
+            if i == 500 # Special write
+                write(io, Float32(5), UInt16(8))
+                write(io, UInt8(19), UInt16(20)*ones(UInt16,2,2))
+                for x=1:6, y=1:600
+                    write(io, Float32(5))
+                    write(io,Int32(5)*ones(Int32,5,5))  
+                end
+            else
+                write(io, rand(Float32), rand(UInt16))
+                write(io, rand(UInt8), rand(UInt16,2,2))
+                for x=1:6, y=1:600
+                    write(io, rand(Float32))
+                    write(io, rand(Int32,5,5)) 
+                end
+            end
+        end
+    end
+
+    @test_throws ArgumentError BinaryRecReader.construct_reader_exp(:CompoundRecComplex , CompoundRecComplex, (data = (6, 600),)) 
+    @test AnotherSimpleRecMat ∉ BinaryRecReader.def_reads
+    eval(:(@construct_reader AnotherSimpleRecMat (funMat = (2, 2),)))
+    @test AnotherSimpleRecMat ∈ BinaryRecReader.def_reads
+    @test SimpleRecMat  ∉ BinaryRecReader.def_reads
+    @test_throws ArgumentError BinaryRecReader.construct_reader_exp(:CompoundRecComplex , CompoundRecComplex, (data = (6, 600),)) 
+    eval(:(@construct_reader SimpleRecMat  (time = (5, 5),)))
+    @test SimpleRecMat ∈ BinaryRecReader.def_reads
+    @test_nowarn BinaryRecReader.construct_reader_exp(:CompoundRecComplex , CompoundRecComplex, (data = (6, 600),)) 
+    eval(:(@construct_reader CompoundRecComplex (data = (6, 600),)))
+    my_data = Vector{CompoundRecComplex}(undef, n_rec)
+    read!(simple_file, my_data);
+    @test my_data[500].long == 5
+    @test my_data[500].COG == 8
+    @test my_data[500].funky.fun == 19
+    @test all(my_data[500].funky.funMat .== 20)
+    @test all([x.lat==5&&all(x.time.==5) for x in my_data[500].data])
 end;
