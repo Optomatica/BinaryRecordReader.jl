@@ -1,4 +1,4 @@
-module BinaryRecReader
+module BinaryRecordReader
 
 using MacroTools
 

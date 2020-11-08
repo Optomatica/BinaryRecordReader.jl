@@ -9,7 +9,7 @@ This package allow for the convient description for the structure of binary file
 
 Example usage 
 ```julia
-using BinaryRecReader
+using BinaryRecordReader
 
 
 struct TestS
