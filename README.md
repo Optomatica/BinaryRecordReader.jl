@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.com/Optomatica/BinaryRecordReader.jl.svg?branch=master)](https://travis-ci.com/Optomatica/BinaryRecordReader.jl)
 [![Build status](https://ci.appveyor.com/api/projects/status/fhpn75k3r67ow3ke/branch/master?svg=true)](https://ci.appveyor.com/project/mbeltagy/binaryrecordreader-jl/branch/master)
-[![Coverage](https://codecov.io/gh/mbeltagy/BinaryRecordReader.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/mbeltagy/BinaryRecordReader.jl)
+[![Coverage](https://codecov.io/gh/Optomatica/BinaryRecordReader.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/Optomatica/BinaryRecordReader.jl)
 [![Coverage](https://coveralls.io/repos/github/mbeltagy/BinaryRecordReader.jl/badge.svg?branch=master)](https://coveralls.io/github/mbeltagy/BinaryRecordReader.jl?branch=master)
 
 This package allow for the convient description for the structure of binary files. It creates a `read` method that can then be used to read and binary file that follows the described structure. 
