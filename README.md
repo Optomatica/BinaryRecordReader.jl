@@ -4,7 +4,7 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/fhpn75k3r67ow3ke/branch/master?svg=true)](https://ci.appveyor.com/project/mbeltagy/binaryrecordreader-jl/branch/master)
 [![Coverage](https://codecov.io/gh/Optomatica/BinaryRecordReader.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/Optomatica/BinaryRecordReader.jl)
 
-This package allow for the convenient description for the structure of binary records. It creates a `read` method that can be used to read the specified records from binary file. 
+This package allow you to conveniently describe binary records for reading files. It require some annotations around a Julia `type` and creates a `read` method that can be used to type/record from binary file. 
 
 Example usage 
 ```julia
