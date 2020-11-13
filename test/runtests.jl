@@ -29,10 +29,10 @@ BRR = BinaryRecordReader # A convinet shortcut
         more::MinorStruct
     end
 
-    @test_logs (:warn, "Attempt to create a reader for plain data type Boo") BRR.construct_reader_exp(:Boo, Boo, NamedTuple())
-    @test_logs (:warn, "Attempt to create a reader for plain data type TinyStruct") BRR.construct_reader_exp(:TinyStruct, TinyStruct, NamedTuple())
-    @test_logs (:warn, "Attempt to create a reader for plain data type MinorStruct") BRR.construct_reader_exp(:MinorStruct, MinorStruct, NamedTuple())
-    @test_logs (:warn, "Attempt to create a reader for plain data type MajorStruct") BRR.construct_reader_exp(:MajorStruct, MinorStruct, NamedTuple())
+    @test_logs (:warn, "Attempt to create a reader for plain data type Boo") BRR.construct_reader_exp(Boo, NamedTuple())
+    @test_logs (:warn, "Attempt to create a reader for plain data type TinyStruct") BRR.construct_reader_exp(TinyStruct, NamedTuple())
+    @test_logs (:warn, "Attempt to create a reader for plain data type MinorStruct") BRR.construct_reader_exp(MinorStruct, NamedTuple())
+    @test_logs (:warn, "Attempt to create a reader for plain data type MajorStruct") BRR.construct_reader_exp(MajorStruct, NamedTuple())
 end;
 
 struct RecHeaderExtended 
@@ -66,7 +66,7 @@ end
     @test my_data[500].COG == 8
     @test my_data[500].time == 9
     @test my_data[500].data == 4* ones(Int32, 6, 600)
-    @test_throws TypeError BRR.construct_reader_exp(:RecHeaderExtended , RecHeaderExtended , (long = (6, 600),)) 
+    @test_throws TypeError BRR.construct_reader_exp(RecHeaderExtended , (long = (6, 600),)) 
 end;
 
 struct SimpleRec
@@ -141,15 +141,15 @@ end
         end
     end
 
-    @test_throws ArgumentError BRR.construct_reader_exp(:CompoundRecComplex , CompoundRecComplex, (data = (6, 600),)) 
+    @test_throws ArgumentError BRR.construct_reader_exp(CompoundRecComplex, (data = (6, 600),)) 
     @test AnotherSimpleRecMat ∉ BRR.def_reads
     eval(:(@construct_reader AnotherSimpleRecMat (funMat = (2, 2),)))
     @test AnotherSimpleRecMat ∈ BRR.def_reads
     @test SimpleRecMat  ∉ BRR.def_reads
-    @test_throws ArgumentError BRR.construct_reader_exp(:CompoundRecComplex , CompoundRecComplex, (data = (6, 600),)) 
+    @test_throws ArgumentError BRR.construct_reader_exp(CompoundRecComplex, (data = (6, 600),)) 
     eval(:(@construct_reader SimpleRecMat  (time = (5, 5),)))
     @test SimpleRecMat ∈ BRR.def_reads
-    @test_nowarn BRR.construct_reader_exp(:CompoundRecComplex , CompoundRecComplex, (data = (6, 600),)) 
+    @test_nowarn BRR.construct_reader_exp(CompoundRecComplex, (data = (6, 600),)) 
     eval(:(@construct_reader CompoundRecComplex (data = (6, 600),)))
     my_data = Vector{CompoundRecComplex}(undef, n_rec)
     read!(simple_file, my_data);

@@ -9,7 +9,7 @@ global const def_reads=Set{DataType}()
 macro construct_reader(Struct, dims)
     array_specs = eval(dims)
     s = eval(:($__module__.$Struct))
-    esc(construct_reader_exp(Struct,s,array_specs))
+    esc(construct_reader_exp(s,array_specs))
 end
 
 
@@ -17,10 +17,10 @@ macro construct_reader(Struct)
     esc(:(@construct_reader $Struct NamedTuple()))
 end
 
-function construct_reader_exp(Struct, s, array_specs)
-    isbitstype(s) && (@warn("Attempt to create a reader for plain data type $Struct"); return nothing) # short ciruite for isbitstype
+function construct_reader_exp(s, array_specs)
+    isbitstype(s) && (@warn("Attempt to create a reader for plain data type $s"); return nothing) # short ciruite for isbitstype
     expr = quote
-        function Base.read(io::IOStream, ::Type{$Struct})
+        function Base.read(io::IOStream, ::Type{$s})
     end end |> prettify
     for (f,t) in  zip(fieldnames(s), fieldtypes(s))
         if haskey(array_specs,f)
@@ -34,7 +34,7 @@ function construct_reader_exp(Struct, s, array_specs)
         end
     end
     fields = [f for f in fieldnames(s)]
-    push!(expr.args[2].args, Expr(:call,Struct,fields...))
+    push!(expr.args[2].args, Expr(:call,s,fields...))
     push!(def_reads,s) #marking it as defined
     expr
 end
