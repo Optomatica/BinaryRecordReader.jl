@@ -1,13 +1,13 @@
 name = "BinaryRecordReader"
 uuid = "27e49e6c-9eba-4945-878d-08e5ccc7cbcd"
 authors = ["mbeltagy <mohammed.elbeltagy@gmail.com> and contributors"]
-version = "0.1.1"
+version = "0.1.2"
 
 [deps]
 MacroTools = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
 
 [compat]
-julia = "1.5"
+julia = "1.1"
 MacroTools = "0.5.6"
 
 [extras]
