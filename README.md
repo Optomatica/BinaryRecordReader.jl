@@ -49,3 +49,7 @@ or implicitly, via `read!` while filling up an array, as in
 myrecs=Vector{TestS}(undef,15)
 read!(file_name,myrecs)
 ```
+## Other convieance methods 
+In addtion to `@construct_reader`, which is intended for use at the top level, there are two conviance methods that can be called inside functions. `construct_reader_shallow` is indentical is form to `@construct_reader`, with added benenfit of being executable insided any function/context. 
+
+Additionally, we have `construct_reader_deep` which can be used to specifiy the dimensinality of internal structure with unspesified 
