@@ -4,7 +4,7 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/fhpn75k3r67ow3ke/branch/master?svg=true)](https://ci.appveyor.com/project/mbeltagy/binaryrecordreader-jl/branch/master)
 [![Coverage](https://codecov.io/gh/Optomatica/BinaryRecordReader.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/Optomatica/BinaryRecordReader.jl)
 
-This package allow you to conveniently describe binary records for reading files. It require some annotations around a Julia `type` and creates a `read` method that can be used to type/record from binary file. 
+This package allow you to conveniently describe binary records for reading files. It require some extra dimensionally information for Julia `Array` fields inside a given `type` and creates a suitable `read` method.
 
 Example usage 
 ```julia
@@ -49,7 +49,33 @@ or implicitly, via `read!` while filling up an array, as in
 myrecs=Vector{TestS}(undef,15)
 read!(file_name,myrecs)
 ```
-## Other convieance methods 
-In addtion to `@construct_reader`, which is intended for use at the top level, there are two conviance methods that can be called inside functions. `construct_reader_shallow` is indentical is form to `@construct_reader`, with added benenfit of being executable insided any function/context. 
+## Other convenience methods 
+In addition to `@construct_reader`, which is intended for use at the top level, there are two convenience  methods that can be called inside functions. 
 
-Additionally, we have `construct_reader_deep` which can be used to specifiy the dimensinality of internal structure with unspesified 
+`construct_reader_shallow` is identical in form to `@construct_reader`, with added benefit of being executable inside any function/context. 
+
+`construct_reader_deep` has the added functionality where we can specify the dimensionality of internal types arrays. For example with following types
+
+```julia
+struct SimpleRecMat
+    lat::Float32
+    time::Matrix{Int32}
+end
+
+struct AnotherSimpleRecMat
+    fun::UInt8
+    funMat::Matrix{UInt16}
+end
+
+struct CompoundRecComplex
+    long::Float32
+    COG::UInt16
+    funky::AnotherSimpleRecMat
+    data::Matrix{SimpleRecMat}
+end
+```
+We can fully a specify all three readers for each one on then by invoking 
+```julia
+construct_reader_deep(CompoundRecComplex, (data=(5,5), AnotherSimpleRecMat__funMat=(2,2), SimpleRecMat__time =(3,3)))
+```
+Note that for internal type definition we have to be a explicit in the specifying the the internal field names via a `Type__filedName` syntax. 
