@@ -3,3 +3,4 @@
 *.jl.mem
 scratch.jl
 /Manifest.toml
+.vscode
