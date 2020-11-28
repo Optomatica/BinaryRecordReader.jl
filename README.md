@@ -78,4 +78,4 @@ We can fully a specify all three readers for each one on then by invoking
 ```julia
 construct_reader_deep(CompoundRecComplex, (data=(5,5), AnotherSimpleRecMat__funMat=(2,2), SimpleRecMat__time =(3,3)))
 ```
-Note that for internal type definition we have to be a explicit in the specifying the the internal field names via a `Type__filedName` syntax. 
+Note that for internal type definition we have to be a explicit in the specifying the the internal field names via a `Type__fieldName` syntax. 
